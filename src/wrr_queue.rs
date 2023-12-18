@@ -2,6 +2,27 @@ use crate::instance::Instance;
 use num::integer::lcm;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
+/// weighted round robin queue struct
+///
+/// WRR queue, each time new instance is inserted, balance queue need to be recalculated.
+/// So minimizing the insert operation can improve performance.
+///
+/// `select` method requires only an atomic usize and a Read access to the RwLock.
+/// There should be of no runtime performance issue.
+///
+/// example:
+///
+/// ```no_run
+/// use async_wrr_queue::{WrrQueue, Instance};
+/// use std::num::NonZeroUsize;
+///
+/// let mut queue = WrrQueue::new().insert_many([("data1", 1), ("data2", 2), ("data3", 3)]).await;
+/// queue.insert(Instance::new_with_weight("data4", NonZeroUsize::new(4).unwrap())).await;
+///
+/// let selected1 = queue.select();
+/// let selected2 = queue.select();
+/// let selected3 = queue.select();
+/// ```
 pub struct WrrQueue<T: PartialEq> {
     instance_list: Vec<Instance<T>>,
     cur_idx: AtomicUsize,
@@ -12,6 +33,7 @@ pub struct WrrQueue<T: PartialEq> {
 }
 
 impl<T: PartialEq> Default for WrrQueue<T> {
+    /// create a default WRR Queue, with no data
     fn default() -> Self {
         WrrQueue {
             instance_list: Vec::new(),
@@ -45,12 +67,15 @@ impl<T: PartialEq> WrrQueue<T> {
 
 #[cfg(feature = "tokio")]
 impl<T: PartialEq> WrrQueue<T> {
+    /// insert a new instance, and re-calculate request queue
     pub async fn insert(&mut self, instance: impl Into<Instance<T>>) -> bool {
         let res = self.insert_uncalculated(instance.into());
         self.recalculate_queue().await;
         res
     }
 
+    /// insert a new instance vec, and re-calculate request queue
+    /// recommended when have multiple instance to be inserted
     pub async fn insert_many<U>(&mut self, instance_list: impl Into<Vec<U>>) -> bool
     where
         T: PartialEq,
@@ -65,6 +90,8 @@ impl<T: PartialEq> WrrQueue<T> {
         res
     }
 
+    /// return the selected instance, None if instance_list is empty
+    /// NOTE: select operation used only atomic operation, and can be paralleled  
     pub async fn select(&mut self) -> Option<&Instance<T>> {
         if self.instance_list.is_empty() {
             None
@@ -105,12 +132,15 @@ impl<T: PartialEq> WrrQueue<T> {
 
 #[cfg(feature = "blocking")]
 impl<T: PartialEq> WrrQueue<T> {
+    /// insert a new instance, and re-calculate request queue
     pub fn insert(&mut self, instance: impl Into<Instance<T>>) -> bool {
         let res = self.insert_uncalculated(instance.into());
         self.recalculate_queue();
         res
     }
 
+    /// insert a new instance vec, and re-calculate request queue
+    /// recommended when have multiple instance to be inserted
     pub fn insert_many<U>(&mut self, instance_list: impl Into<Vec<U>>) -> bool
     where
         T: PartialEq,
@@ -125,6 +155,8 @@ impl<T: PartialEq> WrrQueue<T> {
         res
     }
 
+    /// return the selected instance, None if instance_list is empty
+    /// NOTE: select operation used only atomic operation, and can be paralleled  
     pub fn select(&mut self) -> Option<&Instance<T>> {
         if self.instance_list.is_empty() {
             None

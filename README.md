@@ -16,6 +16,9 @@ recalculate queue.
 - Atomic operation aimed to provide the best run-time performance 
 - dynamic insert supported
 
+more detailed documented [WrrQueue](https://docs.rs/async_wrr_queue/latest/async_wrr_queue/struct.WrrQueue.html) | 
+[Instance](https://docs.rs/async_wrr_queue/latest/async_wrr_queue/struct.Instance.html)
+
 ## Example 
 
 ```rust
