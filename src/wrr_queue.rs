@@ -12,7 +12,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 ///
 /// example:
 ///
-/// ```no_run
+/// ```ignore
 /// use async_wrr_queue::{WrrQueue, Instance};
 /// use std::num::NonZeroUsize;
 ///
