@@ -6,6 +6,9 @@ operation and cache queue in order to avoid lock latency or the schedule latency
 And we have used an async RwLock (feature `default` or `tokio`) to overcome the 
 conflict of select instance and recalculate queue.
 
+![github actions](https://github.com/dupeiran001/async_wrr_queue_rs/actions/workflows/rust.yml/badge.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 - async interface for tokio
 - Atomic operation aimed to provide the best run-time performance 
 - dynamic insert supported
