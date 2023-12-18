@@ -3,7 +3,7 @@ name = "async_wrr_queue"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-description = "[async & high performance] queued weighted round-robin weight balance algorithm"
+description = "[async & high performance] queued weighted round-robin load balance algorithm"
 repository = "https://github.com/dupeiran001/async_wrr_queue_rs"
 homepage = "https://github.com/dupeiran001/async_wrr_queue_rs"
 readme = "README.md"
@@ -16,7 +16,11 @@ num = "0.4.1"
 
 [features]
 default = ["tokio"]
+
+# Enable tokio async support
 tokio = ["dep:tokio"]
+
+# Use blocking api
 blocking = []
 
 [dev-dependencies]

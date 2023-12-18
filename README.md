@@ -1,11 +1,14 @@
 
 # Async WRR Queue
 
-this is a wrapping of weighted round-robin schedule algorithm, utilizing atomic 
-operation and cache queue in order to avoid lock latency or the schedule latency.
-And we have used an async RwLock (feature `default` or `tokio`) to overcome the 
-conflict of select instance and recalculate queue.
+this is a wrapping of `weighted round-robin`
+schedule algorithm, utilizing [atomic operation](https://doc.rust-lang.org/std/sync/atomic/struct.AtomicUsize.html) 
+and cache queue in order to avoid lock latency or the schedule latency. And we have 
+used an async [RwLock](https://docs.rs/tokio/latest/tokio/sync/struct.RwLock.html) 
+(feature `default` or `tokio`) to overcome the conflict of select instance and 
+recalculate queue.
 
+![crate.io](https://img.shields.io/crates/v/async_wrr_queue.svg)
 ![github actions](https://github.com/dupeiran001/async_wrr_queue_rs/actions/workflows/rust.yml/badge.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
