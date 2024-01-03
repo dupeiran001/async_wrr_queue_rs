@@ -1,7 +1,7 @@
 [registries]
 kellnr = { index = "sparse+http://crates.obei.com.cn/api/v1/crates/", token = "Zy9HhJ02RJxg0GCrgLfaCVfU6IwDfhXD" }
 
-[source.crates-io]
-replace-with = "obei-cratesio"
-[source.obei-cratesio]
-registry = "sparse+http://crates.obei.com.cn/api/v1/crates/"
+#[source.crates-io]
+#replace-with = "obei-cratesio"
+#[source.obei-cratesio]
+#registry = "sparse+http://crates.obei.com.cn/api/v1/crates/"
