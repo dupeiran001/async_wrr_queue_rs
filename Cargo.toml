@@ -1,6 +1,6 @@
 [package]
 name = "async_wrr_queue"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 license = "MIT"
 description = "[async & high performance] queued weighted round-robin load balance algorithm"
@@ -11,8 +11,13 @@ keywords = ["weighted-round-robin", "high-performance", "Async"]
 categories = ["algorithms"]
 
 [dependencies]
-tokio = { version = "1.35.0", features = ["sync", "rt", "macros"], optional = true }
+tokio = { version = "1.35.0", features = [
+  "sync",
+  "rt",
+  "macros",
+], optional = true }
 num = "0.4.1"
+log = "0.4.20"
 
 [features]
 default = ["tokio"]
@@ -25,4 +30,3 @@ blocking = []
 
 [dev-dependencies]
 tokio = { version = "1.35.0", features = ["default", "rt-multi-thread"] }
-

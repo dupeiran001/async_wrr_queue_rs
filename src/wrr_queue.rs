@@ -1,4 +1,5 @@
 use crate::instance::Instance;
+use log::error;
 use num::integer::lcm;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
@@ -52,14 +53,31 @@ impl<T: PartialEq> WrrQueue<T> {
         Self::default()
     }
 
-    fn insert_uncalculated(&mut self, instance: Instance<T>) -> bool
-    where
-        T: PartialEq,
-    {
+    fn insert_uncalculated(&mut self, instance: Instance<T>) -> bool {
         if self.instance_list.contains(&instance) {
             false
         } else {
             self.instance_list.push(instance);
+            true
+        }
+    }
+
+    fn clear_instance_uncalculated(&mut self) {
+        self.instance_list = Default::default();
+        self.cur_idx = Default::default();
+        self.select_queue = Default::default();
+    }
+
+    fn delete_uncalculated(&mut self, instance: Instance<T>) -> bool {
+        if self.instance_list.contains(&instance) {
+            false
+        } else {
+            let index = self
+                .instance_list
+                .iter()
+                .position(|x| *x == instance)
+                .unwrap();
+            self.instance_list.remove(index);
             true
         }
     }
@@ -104,7 +122,26 @@ impl<T: PartialEq> WrrQueue<T> {
         }
     }
 
+    /// clear instance in the queue
+    pub fn clear_instance(&mut self) {
+        self.clear_instance_uncalculated();
+    }
+
+    /// delete certain instance
+    pub async fn delete_instance(&mut self, instance: Instance<T>) -> bool {
+        if self.delete_uncalculated(instance) {
+            self.recalculate_queue().await;
+            true
+        } else {
+            false
+        }
+    }
+
     async fn recalculate_queue(&mut self) {
+        if self.instance_list.is_empty() {
+            self.clear_instance();
+            return;
+        }
         let lcm = self
             .instance_list
             .iter()
@@ -172,6 +209,21 @@ impl<T: PartialEq> WrrQueue<T> {
         }
     }
 
+    /// clear instance in the queue
+    pub fn clear_instance(&mut self) {
+        self.clear_instance_uncalculated();
+    }
+
+    /// delete certain instance
+    pub fn delete_instance(&mut self, instance: Instance<T>) -> bool {
+        if self.delete_uncalculated(instance) {
+            self.recalculate_queue();
+            true
+        } else {
+            false
+        }
+    }
+
     fn recalculate_queue(&mut self) {
         let lcm = self
             .instance_list
@@ -202,6 +254,10 @@ impl<T: PartialEq> WrrQueue<T> {
 }
 
 fn select_instance(weight_vec: &Vec<usize>, cur_weight: &mut [isize]) -> usize {
+    if weight_vec.is_empty() {
+        error!("failed to select an instance: instance list is empty");
+        return 0;
+    }
     let mut selected = 0;
     let mut acc = 0isize;
     for i in 0..weight_vec.len() {
